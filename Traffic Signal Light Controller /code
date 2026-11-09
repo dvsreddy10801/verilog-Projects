@@ -1,1 +1,80 @@
 
+module traffic_light_controller(
+    input clk, reset,
+    output reg [2:0] count,
+    output reg R1, Y1, G1,
+    output reg R2, Y2, G2,
+    output reg R3, Y3, G3,
+    output reg R4, Y4, G4
+);
+
+// State Encoding
+parameter [1:0] state1 = 2'b00;
+parameter [1:0] state2 = 2'b01;
+parameter [1:0] state3 = 2'b10;
+parameter [1:0] state4 = 2'b11;
+
+reg [1:0] state;
+
+// Time Delays
+parameter [2:0] delay7 = 3'b111;
+parameter [2:0] delay5 = 3'b101;
+parameter [2:0] delay2 = 3'b010;
+
+// State Transition Logic
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        state <= state1;
+        count <= 0;
+    end else begin
+        case (state)
+            state1: if (count < delay7) begin
+                state <= state1;
+                count <= count + 1;
+            end else begin
+                state <= state2;
+                count <= 3'b000;
+            end
+            
+            state2: if (count < delay2) begin
+                state <= state2;
+                count <= count + 1;
+            end else begin
+                state <= state3;
+                count <= 3'b000;
+            end
+            
+            state3: if (count < delay5) begin
+                state <= state3;
+                count <= count + 1;
+            end else begin
+                state <= state4;
+                count <= 3'b000;
+            end
+            
+            state4: if (count < delay7) begin
+                state <= state4;
+                count <= count + 1;
+            end else begin
+                state <= state1;
+                count <= 3'b000;
+            end
+            
+            default: state <= state1;
+        endcase
+    end
+end
+
+// Output Logic
+always @(state) begin
+    case (state)
+        state1: begin R1 = 0; Y1 = 0; G1 = 1; R2 = 0; Y2 = 0; G2 = 1; R3 = 1; Y3 = 0; G3 = 0; R4 = 1; Y4 = 0; G4 = 0; end
+        state2: begin R1 = 0; Y1 = 1; G1 = 0; R2 = 0; Y2 = 1; G2 = 0; R3 = 1; Y3 = 0; G3 = 0; R4 = 1; Y4 = 0; G4 = 0; end
+        state3: begin R1 = 1; Y1 = 0; G1 = 0; R2 =1 ; Y2 = 0; G2 = 0; R3 = 0; Y3 = 0; G3 = 1; R4 = 0; Y4 = 0; G4 =1; end
+        state4: begin R1 = 1; Y1 = 0; G1 = 0; R2 = 1; Y2 = 0; G2 = 0; R3 = 0; Y3 = 1; G3 = 0; R4 = 0; Y4 = 1; G4 = 0; end
+        default: begin R1 = 1; Y1 = 0; G1 = 0; R2 = 1; Y2 = 0; G2 = 0; R3 = 1; Y3 = 0; G3 = 0; R4 = 1; Y4 = 0; G4 = 0; end
+    endcase
+end
+
+endmodule
+
