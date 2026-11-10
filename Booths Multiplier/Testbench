@@ -1,0 +1,26 @@
+// Code your testbench here
+// or browse Examples
+module booth_tb;
+    reg signed [7:0] multiplicand, multiplier;
+    wire signed [15:0] product;
+
+    booth_multiplier uut (
+        .multiplicand(multiplicand),
+        .multiplier(multiplier),
+        .product(product)
+    );
+
+    initial begin
+        $monitor("Multiplicand = %d, Multiplier = %d, Product = %d", multiplicand, multiplier, product);
+
+        multiplicand =  8'd12; multiplier = -8'd5; #10; // 12 * (-5) = -60
+        multiplicand =  8'd5;  multiplier =  8'd3; #10; // 5 * 3 = 15
+        multiplicand = -8'd7;  multiplier =  8'd4; #10; // -7 * 4 = -28
+        multiplicand = -8'd6;  multiplier = -8'd3; #10; // -6 * -3 = 18
+
+        $finish;
+    end
+  initial begin
+    $dumpfile("dump.vcd"); $dumpvars;
+  end
+endmodule
